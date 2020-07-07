@@ -11,6 +11,12 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, DELETE, PATCH')
+    return response
+
 '''
 @TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
@@ -29,15 +35,16 @@ CORS(app)
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
+    '''
     all_drinks = Drink.query.all()
     drinks = {drink.short() for drink in all_drinks}
 
     if len(categories) == 0:
         abort(404)
-
+    '''
     return jsonify({
         "success": True,
-        "drinks": drinks
+        #"drinks": drinks
     })
 
 '''
