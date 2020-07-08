@@ -1,13 +1,13 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
 
-AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
+AUTH0_DOMAIN = 'fsnd-my-coffee-shop.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = 'coffeeshop'
 
 ## AuthError Exception
 '''
@@ -42,7 +42,6 @@ def get_token_auth_header():
         abort(401)
     elif header_parts[0].lower() != 'bearer':
         abort(401)
-
     return header_parts[1]
         
 '''
@@ -116,6 +115,7 @@ def verify_decode_jwt(token):
             }, 401)
 
         except jwt.JWTClaimsError:
+            print("invalid claims")
             raise AuthError({
                 'code': 'invalid_claims',
                 'description': 'Incorrect claims. Please, check the audience and issuer.'
