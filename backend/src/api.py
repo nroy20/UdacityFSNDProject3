@@ -131,7 +131,7 @@ def modify_drink(payload, drink_id):
         if title:
             drink.title = title
         if recipe:
-            drink.recipe = recipe
+            drink.recipe = json.dumps(recipe)
         drink.update()
 
         all_drinks = Drink.query.all()
@@ -140,7 +140,7 @@ def modify_drink(payload, drink_id):
 
         return jsonify({
             "success": True,
-            "drinks": drink
+            "drinks": [drink.long()]
         })
     except:
         abort(422)

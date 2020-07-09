@@ -32,16 +32,24 @@ class AuthError(Exception):
 '''
 def get_token_auth_header():
     if 'Authorization' not in request.headers:
-        #replace w AuthError
-        abort(401)
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "no header is present"
+        }, 401)
 
     auth_header = request.headers['Authorization']
     header_parts = auth_header.split(' ')
 
     if len(header_parts) != 2:
-        abort(401)
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "header is malformed"
+        }, 401)
     elif header_parts[0].lower() != 'bearer':
-        abort(401)
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "header is malformed"
+        }, 401)
     return header_parts[1]
         
 '''
@@ -57,9 +65,15 @@ def get_token_auth_header():
 '''
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
-        abort(400)
+        raise AuthError({
+            "code": "invalid_payload",
+            "description": "permissions are not included in payload"
+        }, 400)
     if permission not in payload['permissions']:
-        abort(403)
+        raise AuthError({
+            "code": "invalid_permissions",
+            "description": "requested permission string is not in the payload permissions array"
+        }, 403)
     return True
     
 
@@ -115,7 +129,6 @@ def verify_decode_jwt(token):
             }, 401)
 
         except jwt.JWTClaimsError:
-            print("invalid claims")
             raise AuthError({
                 'code': 'invalid_claims',
                 'description': 'Incorrect claims. Please, check the audience and issuer.'
