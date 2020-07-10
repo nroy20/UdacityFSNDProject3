@@ -38,10 +38,9 @@ def after_request(response):
 def get_drinks(): 
 
     all_drinks = Drink.query.all()
-    drinks = [drink.short() for drink in all_drinks]
 
-    if len(drinks) == 0:
-        abort(404)
+    drinks = [drink.long() for drink in all_drinks]
+
 
     return jsonify({
         "success": True,
@@ -59,11 +58,10 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drink_details(payload):
-    all_drinks = Drink.query.all()
-    drinks = [drink.long() for drink in all_drinks]
 
-    if len(categories) == 0:
-        abort(404)
+    all_drinks = Drink.query.all()
+
+    drinks = [drink.long() for drink in all_drinks]
 
     return jsonify({
         "success": True,
@@ -95,7 +93,6 @@ def add_drink(payload):
 
         drink.insert()
 
-
         all_drinks = Drink.query.all()
         if len(all_drinks) == 0:
             abort(404)
@@ -104,7 +101,8 @@ def add_drink(payload):
             "success": True,
             "drinks": [drink.long()]
         })
-    except:
+    except Exception as e:
+        print(e)
         abort(422)
         
 '''
@@ -220,3 +218,8 @@ def bad_request(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(AuthError)
+def error_auth(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
